@@ -15,6 +15,28 @@ router.get("/", function(req, res, next) {
   });
 });
 
+/* return list of persons in db */
+router.get("/search", function(req, res, next) {
+  // console.log({ req });
+  if (!req.query.keyword) {
+    return res.json({
+      error: true,
+      message: "No keyword supplied"
+    });
+  }
+
+  Person.find({ name: new RegExp(req.query.keyword, "i") })
+    .limit(20)
+    .exec((err, data) => {
+      if (err)
+        return res.json({
+          error: true,
+          message: "An error occured searching for a person"
+        });
+      return res.json({ success: true, data: data });
+    });
+});
+
 router.post("/create", function(req, res, next) {
   // check if file was uploaded
   // console.log("request ", req);
