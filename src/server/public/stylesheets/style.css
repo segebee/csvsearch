@@ -1,8 +1,73 @@
 body {
-  padding: 50px;
+  color: #444;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #00B7FF;
+.progress {
+  display: none;
+  margin-top: 5px;
+}
+#progressbar {
+  width: 0;
+}
+#uploadMessage {
+  display: none;
+  margin-top: 5px;
+}
+
+#searchField {
+  border-radius: 2px;
+  border: none;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+#resultsBox {
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 0;
+}
+#resultDetails {
+  display: none;
+  padding: 10px;
+  margin-top: 10px;
+}
+#resultsList {
+  display: none;
+  width: inherit;
+  list-style: none;
+  padding: 0;
+  margin-top: 5px;
+}
+#resultsList li {
+  padding: 5px;
+  padding-left: 10px;
+}
+#resultsList li:hover {
+  background-color: rgb(236, 236, 236);
+  color: #999;
+  cursor: pointer;
+  border-left: 2px solid rgb(157, 201, 157);
+}
+
+.logo {
+  padding: 10px;
+}
+
+#main {
+  margin-top: 20px;
+}
+#intro {
+  padding: 10px;
+}
+#intro-title {
+  font-weight: 700;
+}
+#intro-description {
+  padding: 0;
+}
+
+.sectionTitle {
+  font-weight: 700;
+  border-bottom: 1px solid rgb(157, 201, 157);
+  padding-bottom: 5px;
 }
