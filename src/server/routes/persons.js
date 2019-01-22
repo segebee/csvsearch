@@ -53,7 +53,7 @@ router.post("/create", function(req, res, next) {
   const peopleFile = req.files.file;
   const csvFolder = path.resolve("./src/server/public/csvs/");
   const fileName = csvFolder + "/data.csv";
-  console.log({ csvFolder });
+  // console.log({ csvFolder });
   peopleFile.mv(fileName, function(err) {
     if (err) {
       console.log(err);
@@ -63,51 +63,96 @@ router.post("/create", function(req, res, next) {
   // console.log("people file ", peopleFile);
   const stream = fs.createReadStream(fileName);
   // console.log({ stream });
-  // var people = [];
-  const csvStream = csv()
+  let people = [];
+  stream
+    .pipe(csv())
     .on("data", function(data) {
-      if (!data[1]) return false;
-      let fields = {};
-      fields["name"] = data[1];
-      fields["age"] = data[2];
-      fields["address"] = data[3];
-      fields["team"] = data[4];
-      console.log({ fields });
-      const person = new Person(fields);
-      person.save(function(err) {
-        if (err) console.log("error creating person", err);
-        console.log("success creating person");
-      });
+      console.log("received");
+      // console.log({ data });
     })
     .on("error", function(e) {
-      console.log("errrrrrrr", e);
-      return res.status(400).json({
-        error: true,
-        message: "An error occured parsing document"
-      });
+      console.log("error", e);
+    })
+    .on("finish", function(e) {
+      console.log("finish");
+      stream.destroy();
+    })
+    .on("close", function(e) {
+      console.log("close", e);
+    })
+    .on("read", function(e) {
+      console.log("read", e);
     })
     .on("end", function() {
-      // console.log("people ", people);
-      // if (people.length < 1) {
-      //   return res.status(400).json({
-      //     error: true,
-      //     message: "Uploaded file does not match expected format"
-      //   });
-      // }
-
-      // if (err)
-      //   return res.status(400).json({
-      //     error: true,
-      //     message: "An error occured creating persons"
-      //   });
-
-      return res.json({
-        success: true,
-        message: "Data saved successfully"
-      });
+      console.log("end");
     });
+  // const csvStream = csv()
+  //   .on("data", function(data) {
+  //     // if (!data[1]) return false;
+  //     let fields = {};
+  //     fields["name"] = data[1];
+  //     fields["age"] = data[2];
+  //     fields["address"] = data[3];
+  //     fields["team"] = data[4];
+  //     people.push(fields);
+  //     console.log("people ", people.length);
 
-  stream.pipe(csvStream);
+  //     // console.log({ fields });
+  //     // const person = new Person(fields);
+  //     // person.save(function(err) {
+  //     //   if (err) console.log("error creating person", err);
+  //     //   console.log("success creating person");
+  //     // });
+  //   })
+  //   .on("error", function(e) {
+  //     console.log("errrrrrrr", e);
+  //     return res.status(400).json({
+  //       error: true,
+  //       message: "An error occured parsing document"
+  //     });
+  //   })
+  //   .on("end", function() {
+  //     // console.log("people ", people);
+  //     // if (people.length < 1) {
+  //     //   return res.status(400).json({
+  //     //     error: true,
+  //     //     message: "Uploaded file does not match expected format"
+  //     //   });
+  //     // }
+
+  //     // if (err)
+  //     //   return res.status(400).json({
+  //     //     error: true,
+  //     //     message: "An error occured creating persons"
+  //     //   });
+
+  //     //       Potato.collection.insert(potatoBag, onInsert);
+
+  //     // function onInsert(err, docs) {
+  //     //     if (err) {
+  //     //         // TODO: handle error
+  //     //     } else {
+  //     //         console.info('%d potatoes were successfully stored.', docs.length);
+  //     //     }
+  //     // }
+
+  //     console.log("final people ", people.length);
+
+  //     // stream.resume();
+  //     // stream.destroy();
+
+  //     return res.json({
+  //       success: true,
+  //       message: "Data saved successfully"
+  //     });
+  //   })
+  //   .on("close", function(err) {
+  //     // stream.resume();
+  //     stream.destroy();
+  //     console.log("Stream has been destroyed and file has been closed");
+  //   });
+
+  // stream.pipe(csvStream);
 
   // csv
   //   .fromString(peopleFile.data.toString(), {
