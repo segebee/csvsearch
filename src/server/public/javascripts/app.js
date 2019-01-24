@@ -1,7 +1,6 @@
 // declare constants
-const getPersonsUrl = "/persons";
-const searchPersonsUrl = "/persons/search";
-const createPersonsUrl = "/persons/create";
+const searchPersonsUrl = "/search";
+const importPersonsUrl = "/import";
 const searchField = "#searchField";
 const searchResults = "#searchResults";
 const searchItem = ".search-result-item";
@@ -27,12 +26,12 @@ $(document).ready(function() {
     }
     // hide search item details element
     $(resultDetails).slideUp();
-    const keyword = $(this).val();
-    if (keyword.length < 1) {
+    const query = $(this).val();
+    if (query.length < 1) {
       return $(resultsList).slideUp();
     }
-    // search db with keyword
-    return searchPersons(keyword);
+    // search db with query
+    return searchPersons(query);
   });
 
   // handle csv uploads
@@ -66,14 +65,21 @@ $(document).ready(function() {
 
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {
-        const response = JSON.parse(xhr.response);
         if (xhr.status === 200)
-          return renderMessage(response, "success", uploadMessage);
+          return renderMessage(
+            JSON.parse(xhr.response),
+            "success",
+            uploadMessage
+          );
 
-        return renderMessage(response, "error", uploadMessage);
+        return renderMessage(
+          { message: "A network error occured: " + xhr.statusText },
+          "error",
+          uploadMessage
+        );
       }
     };
-    xhr.open("POST", createPersonsUrl, true);
+    xhr.open("POST", importPersonsUrl, true);
     xhr.send(formData);
   });
 });
@@ -82,20 +88,18 @@ $(document).ready(function() {
  * Functions to handle search
  */
 
-// fetch the list of persons using keyword
-function searchPersons(keyword) {
-  const searchRequest = `${searchPersonsUrl}?keyword=${keyword}`;
-  $.getJSON(searchRequest, function(resp) {
+// fetch the list of persons using query
+function searchPersons(query) {
+  $.post(searchPersonsUrl, { query }).done(function(resp) {
     if (resp.error) {
       // handle error
       const errorMessage = `<li style="color:red">${resp.message}</li>`;
-      $(resultsList)
+      return $(resultsList)
         .html(errorMessage)
         .slideDown("slow");
-      return false;
     }
     // pass data returned to function rendering autocomplete
-    return renderAutoComplete(resp.data);
+    return renderAutoComplete(resp.results);
   });
 }
 // display autocomplete
@@ -109,8 +113,8 @@ function renderAutoComplete(result) {
   }
   // render results
   let list = "";
-  result.forEach(result => {
-    list += `<li class="search-result-item" data-name="${
+  result.forEach((result, index) => {
+    list += `<li id="result-${index}" class="search-result-item" data-name="${
       result.name
     }" data-age="${result.age}" data-address="${result.address}" data-team="${
       result.team
@@ -157,12 +161,10 @@ function renderResultDetails(data) {
 function showProgress(evt) {
   // get file upload progress stage
   const progress = (evt.loaded / evt.total) * 100;
-  console.log({ progress });
   // update progressBar width
   progressBar.style.width = progress + "%";
   if (progress === 100) {
     // hide the progress bar
-    console.log("hiding bar");
     hideProgressBar();
   }
 }

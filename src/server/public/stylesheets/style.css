@@ -1,27 +1,30 @@
+/* general styles */
 body {
   color: #444;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
-
-#status {
-  display: none;
-  margin-top: 5px;
-  text-align: center;
+.logo {
+  padding: 10px;
+}
+#main {
+  padding: 25px;
+}
+#intro {
+  padding: 10px;
+}
+#intro-title {
+  font-weight: 700;
+}
+#intro-description {
+  padding: 0;
+}
+.sectionTitle {
+  font-weight: 700;
+  border-bottom: 1px solid rgb(157, 201, 157);
+  padding-bottom: 5px;
 }
 
-.progress {
-  display: none;
-  margin-top: 5px;
-  height: 12px;
-}
-#progressbar {
-  width: 0;
-}
-#uploadMessage {
-  display: none;
-  margin-top: 5px;
-}
-
+/* Styles for search */
 #searchField {
   border-radius: 2px;
   border: none;
@@ -56,25 +59,21 @@ body {
   border-left: 2px solid rgb(157, 201, 157);
 }
 
-.logo {
-  padding: 10px;
+/* Styles for import */
+#status {
+  display: none;
+  margin-top: 5px;
+  text-align: center;
 }
-
-#main {
-  margin-top: 20px;
+.progress {
+  display: none;
+  margin-top: 5px;
+  height: 12px;
 }
-#intro {
-  padding: 10px;
+#progressbar {
+  width: 0;
 }
-#intro-title {
-  font-weight: 700;
-}
-#intro-description {
-  padding: 0;
-}
-
-.sectionTitle {
-  font-weight: 700;
-  border-bottom: 1px solid rgb(157, 201, 157);
-  padding-bottom: 5px;
+#uploadMessage {
+  display: none;
+  margin-top: 5px;
 }
