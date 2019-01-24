@@ -8,16 +8,80 @@ const searchItem = ".search-result-item";
 const resultsList = "#resultsList";
 const resultDetails = "#resultDetails";
 const uploadForm = "#uploadForm";
+const uploadButton = "#uploadButton";
 const uploadField = "uploadField";
+const status = "#status";
 const uploadMessage = "#uploadMessage";
 const progressContainer = ".progress";
 const progressBar = document.getElementById("progressbar");
+const transitionDelay = 1000;
 
-// display upload progress
-function showProgress(evt) {
-  // update progressBar width
-  return (progressBar.style.width = (evt.loaded / evt.total) * 100 + "%");
-}
+// run when document is loaded
+$(document).ready(function() {
+  // handle search
+  $(searchField).on("keyup paste", function(e) {
+    // detect escape key and hide the autocomplete
+    if (e.key === "Escape") {
+      // hide search item details element
+      return $(resultsList).slideUp();
+    }
+    // hide search item details element
+    $(resultDetails).slideUp();
+    const keyword = $(this).val();
+    if (keyword.length < 1) {
+      return $(resultsList).slideUp();
+    }
+    // search db with keyword
+    return searchPersons(keyword);
+  });
+
+  // handle csv uploads
+  $(uploadForm).on("submit", function(event) {
+    event.preventDefault();
+    // disable the upload button so it cannot be clicked during upload
+    $(uploadButton).prop("disabled", true);
+    // shift focus to the search box
+    // $(searchField).focus();
+    // hide message box
+    $(uploadMessage).hide();
+
+    // get file to be uploaded
+    const file = document.getElementById(uploadField).files[0];
+    // check if valid file type
+    if (!file.type.includes("csv")) {
+      const response = {};
+      response.message = `You can only upload CSV files`;
+      return renderMessage(response, "error", uploadMessage);
+    }
+    // show progress bar
+    $(progressContainer).show();
+
+    // create form data to be sent
+    const formData = new FormData();
+    formData.append("file", file);
+
+    // create xhr request
+    const xhr = new XMLHttpRequest();
+    xhr.upload.addEventListener("progress", showProgress);
+
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        const response = JSON.parse(xhr.response);
+        if (xhr.status === 200)
+          return renderMessage(response, "success", uploadMessage);
+
+        return renderMessage(response, "error", uploadMessage);
+      }
+    };
+    xhr.open("POST", createPersonsUrl, true);
+    xhr.send(formData);
+  });
+});
+
+/**
+ * Functions to handle search
+ */
+
 // fetch the list of persons using keyword
 function searchPersons(keyword) {
   const searchRequest = `${searchPersonsUrl}?keyword=${keyword}`;
@@ -85,85 +149,55 @@ function renderResultDetails(data) {
   }</td></tr><tr><td>Team</td><td>${data.team}</td></tr></tbody></table>`;
 }
 
-function hideUploadMessages() {
-  // hide progress bar container
-  setTimeout(function() {
-    $(progressContainer).hide();
-    progressBar.style.width = 0;
-  }, 1000);
-  // hide upload message
-  setTimeout(function() {
-    $(uploadMessage).slideUp();
-  }, 3000);
+/**
+ * Functions to handle file uploads
+ */
+
+// display upload progress
+function showProgress(evt) {
+  // get file upload progress stage
+  const progress = (evt.loaded / evt.total) * 100;
+  console.log({ progress });
+  // update progressBar width
+  progressBar.style.width = progress + "%";
+  if (progress === 100) {
+    // hide the progress bar
+    console.log("hiding bar");
+    hideProgressBar();
+  }
 }
 
-// run when document is loaded
-$(document).ready(function() {
-  // handle search
-  $(searchField).on("keyup paste", function() {
-    // hide search item details element
-    $(resultDetails).slideUp();
-    const keyword = $(this).val();
-    if (keyword.length < 1) {
-      return $(resultsList).slideUp();
+function hideProgressBar() {
+  setTimeout(() => {
+    $(progressContainer).hide();
+    // show loader
+    $(status).show();
+    return resetProgressBar();
+  }, transitionDelay);
+}
+
+function resetProgressBar() {
+  progressBar.style.width = 0;
+}
+
+// render msg returned from the server
+function renderMessage(response, type, messageElement) {
+  // display message in DOM
+  setTimeout(() => {
+    // hide status
+    $(status).hide();
+    let message;
+    // generate message based on response
+    if (type === "success") {
+      message = `<div class="alert alert-success">${response.message}</div>`;
+    } else {
+      message = `<div class="alert alert-danger">${response.message}</div>`;
     }
-    // search db with keyword
-    return searchPersons(keyword);
-  });
-
-  // handle csv uploads
-  $(uploadForm).on("submit", function(event) {
-    event.preventDefault();
-    // shift focus to the search box
-    // $(searchField).focus();
-    // hide message box
-    $(uploadMessage).hide();
-    // show progress bar
-    $(progressContainer).show();
-    // get file to be uploaded
-    const file = document.getElementById(uploadField).files[0];
-    // check if valid file type
-    if (!file.type.includes("csv")) {
-      const message = `<div class="alert alert-danger">You can only upload CSV files</div>`;
-      $(uploadMessage)
-        .html(message)
-        .show("slow");
-      return hideUploadMessages();
-    }
-
-    // create form data to be sent
-    const formData = new FormData();
-    formData.append("file", file);
-
-    // create xhr request
-    const xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4) {
-        const response = JSON.parse(xhr.response);
-        if (xhr.status === 200) {
-          // handle success
-          progressBar.style.backgroundColor = "green";
-          const successMessage = `<div class="alert alert-success">${
-            response.message
-          }</div>`;
-          return $(uploadMessage)
-            .html(successMessage)
-            .show("slow");
-        } else {
-          // handle error
-          progressBar.style.backgroundColor = "red";
-          const errorMessage = `<div class="alert alert-danger">${
-            response.message
-          }</div>`;
-          return $(uploadMessage)
-            .html(errorMessage)
-            .show("slow");
-        }
-      }
-      return hideUploadMessages();
-    };
-    xhr.upload.addEventListener("progress", showProgress);
-    xhr.open("POST", createPersonsUrl, true);
-    xhr.send(formData);
-  });
-});
+    // enable upload buttton
+    $(uploadButton).prop("disabled", false);
+    // show the message
+    return $(messageElement)
+      .html(message)
+      .fadeIn("slow");
+  }, transitionDelay);
+}

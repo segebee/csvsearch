@@ -3,9 +3,16 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+#status {
+  display: none;
+  margin-top: 5px;
+  text-align: center;
+}
+
 .progress {
   display: none;
   margin-top: 5px;
+  height: 12px;
 }
 #progressbar {
   width: 0;
