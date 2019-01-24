@@ -39,11 +39,8 @@ $(document).ready(function() {
     event.preventDefault();
     // disable the upload button so it cannot be clicked during upload
     $(uploadButton).prop("disabled", true);
-    // shift focus to the search box
-    // $(searchField).focus();
     // hide message box
     $(uploadMessage).hide();
-
     // get file to be uploaded
     const file = document.getElementById(uploadField).files[0];
     // check if valid file type
