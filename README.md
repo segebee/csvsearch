@@ -5,10 +5,9 @@ This application makes it easy to search through CSV data. A user can upload a C
 ## SETUP
 
 - install package dependencies by running _npm install_
-
-* ensure a MongoDB server is running
-* start the application by running _npm start_ . this runs the application on port 3000 by default. To specify the PORT, start the application by running _PORT=PORT_NUMBER npm start_
-* navigate to http://localhost:3000 or http://localhost:PORT_NUMBER in your browser to use the application
+- ensure a MongoDB server is running
+- start the application by running _npm start_ . this runs the application on port 3000 by default. To specify the PORT, start the application by running _PORT=PORT_NUMBER npm start_
+- navigate to http://localhost:3000 or http://localhost:PORT_NUMBER in your browser to use the application
 
 ### Dependencies
 
