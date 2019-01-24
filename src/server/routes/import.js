@@ -13,8 +13,7 @@ router.post("/", function(req, res, next) {
       .json({ error: true, message: "No files were uploaded." });
   // get uploaded csv
   const peopleFile = req.files.file;
-  const csvFolder = path.resolve("./src/server/public/csvs/");
-  const fileName = csvFolder + "/data.csv";
+  const fileName = path.resolve(".") + "/data.csv";
   // save uploaded file to disk
   peopleFile.mv(fileName, function(err) {
     if (err) {
